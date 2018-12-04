@@ -10,12 +10,23 @@ var Promise = require('bluebird');
  *   - If `nodeStyleFn` succeeds, the promise should be resolved with its results
  *   - If nodeStyleFn fails, the promise should be rejected with the error
  *
- * Because the returned function returns a promise, it does and should not
+ * Because the returned function returns a promise, it should not
  * expect a callback function as one of its arguments
  */
 
-var promisify = function(nodeStyleFn) {
- // TODO
+var promisify = function (nodeStyleFn) {
+  const nArgs = nodeStyleFn.length;
+  return ((...args) => (new Promise((resolve, reject) => {
+    args = args.slice(0, nArgs - 1);
+    nodeStyleFn(...args, (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(results);
+      }
+    });
+
+  })));
 };
 
 
@@ -30,8 +41,22 @@ var promisify = function(nodeStyleFn) {
  * is rejected with the rejection reason.
  */
 
-var all = function(arrayOfPromises) {
-  // TODO
+var all = function (arrayOfPromises) {
+  return new Promise((resolve, reject) => {
+    let resultsArr = Array(arrayOfPromises.length);
+    let totalResolved = 0;
+    arrayOfPromises.forEach((pro, index) => {
+      pro.then((result) => {
+        resultsArr[index] = result;
+        totalResolved++;
+        if (totalResolved === arrayOfPromises.length) {
+          resolve(resultsArr);
+        }
+      })
+        .catch((err) => reject(err));
+    });
+    //resolve(resultsArr);
+  });
 };
 
 
@@ -41,8 +66,13 @@ var all = function(arrayOfPromises) {
  * the first to be resolved/rejected promise in the passed-in array
  */
 
-var race = function(arrayOfPromises) {
-  // TODO
+var race = function (arrayOfPromises) {
+  return new Promise((resolve, reject) => {
+    arrayOfPromises.forEach(pro => {
+      pro.then(content => resolve(content))
+        .catch(err => reject(err));
+    });
+  });
 };
 
 // Export these functions so we can unit test them

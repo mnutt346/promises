@@ -14,10 +14,10 @@ let writeFile = Promise.promisify(fs.writeFile);
 
 
 var combineFirstLineOfManyFiles = function (filePaths, writePath) {
-  let lines = [];
-  return Promise.all(filePaths.map((file) => {
+  let lines = Array(filePaths.length);
+  return Promise.all(filePaths.map((file, i) => {
     return plucker.pluckFirstLineFromFileAsync(file)
-      .then(line => (lines.push(line)));
+      .then(line => (lines[i] = line));
   }))
     .then(() => writeFile(writePath, lines.join('\n')));
 };
