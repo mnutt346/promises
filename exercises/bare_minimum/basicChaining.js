@@ -19,7 +19,7 @@ var getter = require('./promisification');
 var fetchProfileAndWriteToFile = function (readFilePath, writeFilePath) {
   return plucker.pluckFirstLineFromFileAsync(readFilePath)
     .then(user => getter.getGitHubProfileAsync(user))
-    .then(response => writeFile(writeFilePath, response.json()));
+    .then(response => writeFile(writeFilePath, JSON.stringify(response)));
 };
 
 // Export these functions so we can test them
