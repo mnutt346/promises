@@ -41,21 +41,30 @@ var promisify = function (nodeStyleFn) {
  * is rejected with the rejection reason.
  */
 
+// var all = function (arrayOfPromises) {
+//   return new Promise((resolve, reject) => {
+//     let resultsArr = Array(arrayOfPromises.length);
+//     let totalResolved = 0;
+//     arrayOfPromises.forEach((pro, index) => {
+//       pro.then((result) => {
+//         resultsArr[index] = result;
+//         totalResolved++;
+//         if (totalResolved === arrayOfPromises.length) {
+//           resolve(resultsArr);
+//         }
+//       })
+//         .catch((err) => reject(err));
+//     });
+//   });
+// };
+
 var all = function (arrayOfPromises) {
   return new Promise((resolve, reject) => {
-    let resultsArr = Array(arrayOfPromises.length);
-    let totalResolved = 0;
-    arrayOfPromises.forEach((pro, index) => {
-      pro.then((result) => {
-        resultsArr[index] = result;
-        totalResolved++;
-        if (totalResolved === arrayOfPromises.length) {
-          resolve(resultsArr);
-        }
-      })
-        .catch((err) => reject(err));
-    });
-    //resolve(resultsArr);
+    arrayOfPromises.reduce((acc, pro) => {
+      return pro.then(result => (acc.then(arr => arr.concat(result))))
+        .catch(err => reject(err));
+    }, Promise.resolve([]))
+      .then(arr => resolve(arr));
   });
 };
 

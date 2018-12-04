@@ -34,15 +34,18 @@ var searchCommonConceptsFromGitHubProfiles = function (githubHandles) {
   return Promise.all(githubHandles.map((user, i) => {
     return lib.getGitHubProfile(user)
       .then(userProfile => userProfile.avatarUrl)
-      .then(url => lib.predictImage(url));
+      .then(url => lib.predictImage(url))
+      .catch(err => console.log('Error in SearchCommonConceptsFromGitHubProfiles: ', err));
     // .then(prediction => (arr[i] = prediction));
   }))
-    .then(arr => lib.getIntersection(arr));
-  // .then((arr) => {
-  //   let stuff = lib.getIntersection(arr)
-  //   console.log(stuff);
-  //   return stuff;
-  // });
+    // .then(arr => lib.getIntersection(arr))
+    // .catch(err => console.log('Error in SearchCommonConceptsFromGitHubProfiles: ', err));
+    .then((arr) => {
+      // console.log(arr);
+      let stuff = lib.getIntersection(arr);
+      // console.log(stuff);
+      return stuff;
+    });
 };
 
 // Export these functions so we can unit test them
